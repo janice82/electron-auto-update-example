@@ -1,6 +1,30 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
-
+ 
+ 
+function sendStatusToWindow(text) {
+ 
+  win.webContents.send('message', text);
+}
+autoUpdater.on('checking-for-update', () => {
+  sendStatusToWindow('Checking for update...');
+})
+autoUpdater.on('update-available', (ev, info) => {
+  sendStatusToWindow('Update available.');
+})
+autoUpdater.on('update-not-available', (ev, info) => {
+  sendStatusToWindow('Update not available.');
+})
+autoUpdater.on('error', (ev, err) => {
+  console.log(ev, err);
+  sendStatusToWindow('Error in auto-updater.');
+})
+autoUpdater.on('download-progress', (ev, progressObj) => {
+  sendStatusToWindow('Download progress...');
+})
+autoUpdater.on('update-downloaded', (ev, info) => {
+  sendStatusToWindow('Update downloaded; will install in 5 seconds');
+});
 let mainWindow;
 
 function createWindow () {
@@ -13,10 +37,12 @@ function createWindow () {
     },
   });
   mainWindow.loadFile('index.html');
+  mainWindow.webContents.openDevTools();
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
   mainWindow.once('ready-to-show', () => {
+    console.log('ready-to-show');
     autoUpdater.checkForUpdatesAndNotify();
   });
 }
@@ -38,17 +64,21 @@ app.on('activate', function () {
 });
 
 ipcMain.on('app_version', (event) => {
+  console.log('app_version');
   event.sender.send('app_version', { version: app.getVersion() });
 });
 
 autoUpdater.on('update-available', () => {
+  console.log('update-available');
   mainWindow.webContents.send('update_available');
 });
 
 autoUpdater.on('update-downloaded', () => {
+  console.log('update-downloaded');
   mainWindow.webContents.send('update_downloaded');
 });
 
 ipcMain.on('restart_app', () => {
+  console.log('restart_app');
   autoUpdater.quitAndInstall();
 });
