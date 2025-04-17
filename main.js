@@ -54,7 +54,7 @@ function createWindow () {
     sendStatusToWindow("did-finish-load");
     autoUpdater.checkForUpdatesAndNotify();
   });
-  
+  autoUpdater.checkForUpdatesAndNotify();
 }
 
 app.on('ready', () => {

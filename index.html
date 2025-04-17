@@ -49,7 +49,7 @@
     ipcRenderer.on('app_version', (event, arg) => {
       console.log('app-version html');
       ipcRenderer.removeAllListeners('app_version');
-      version.innerText = 'Version Details' + arg.version;
+      version.innerText = 'Version ' + arg.version;
     });
 
     ipcRenderer.on('update_available', () => {
