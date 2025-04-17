@@ -1,11 +1,16 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
  
+let mainWindow;
+
  
 function sendStatusToWindow(text) {
  
-  win.webContents.send('message', text);
+  mainWindow.webContents.send('message', text);
 }
+autoUpdater.on('error',(err)=>{
+  sendStatusToWindow('error');
+});
 autoUpdater.on('checking-for-update', () => {
   sendStatusToWindow('Checking for update...');
 })
@@ -25,26 +30,31 @@ autoUpdater.on('download-progress', (ev, progressObj) => {
 autoUpdater.on('update-downloaded', (ev, info) => {
   sendStatusToWindow('Update downloaded; will install in 5 seconds');
 });
-let mainWindow;
-
 function createWindow () {
+
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false,
+    //  contextIsolation: false,
     },
   });
   mainWindow.loadFile('index.html');
+  sendStatusToWindow('createWindow');
   mainWindow.webContents.openDevTools();
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
   mainWindow.once('ready-to-show', () => {
-    console.log('ready-to-show');
+    sendStatusToWindow('ready-to-show');
     autoUpdater.checkForUpdatesAndNotify();
   });
+  mainWindow.once("did-finish-load", () => {
+    sendStatusToWindow("did-finish-load");
+    autoUpdater.checkForUpdatesAndNotify();
+  });
+  
 }
 
 app.on('ready', () => {
@@ -68,15 +78,15 @@ ipcMain.on('app_version', (event) => {
   event.sender.send('app_version', { version: app.getVersion() });
 });
 
-autoUpdater.on('update-available', () => {
+ipcMain.on('update_available', (event) => {
   console.log('update-available');
-  mainWindow.webContents.send('update_available');
+  event.sender.send('update_available',{});
 });
 
-autoUpdater.on('update-downloaded', () => {
-  console.log('update-downloaded');
-  mainWindow.webContents.send('update_downloaded');
-});
+// autoUpdater.on('update-downloaded', () => {
+//   console.log('update-downloaded');
+//   mainWindow.webContents.send('update_downloaded');
+// });
 
 ipcMain.on('restart_app', () => {
   console.log('restart_app');

@@ -49,7 +49,7 @@
     ipcRenderer.on('app_version', (event, arg) => {
       console.log('app-version html');
       ipcRenderer.removeAllListeners('app_version');
-      version.innerText = 'Version ' + arg.version;
+      version.innerText = 'Version Details' + arg.version;
     });
 
     ipcRenderer.on('update_available', () => {
@@ -66,12 +66,13 @@
       restartButton.classList.remove('hidden');
       notification.classList.remove('hidden');
     });
-    ipcRenderer.on('message', function(event, text) {
+    ipcRenderer.on('message', (event, text)=>{
+      console.log('message###',text);
   var container = document.getElementById('messages');
   var message = document.createElement('div');
   message.innerHTML = text;
   container.appendChild(message);
-})
+});
 
     function closeNotification() {
       console.log('closeNotification html');
