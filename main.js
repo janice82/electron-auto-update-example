@@ -28,7 +28,7 @@ autoUpdater.on('download-progress', (ev, progressObj) => {
   sendStatusToWindow('Download progress...');
 })
 autoUpdater.on('update-downloaded', (ev, info) => {
-  sendStatusToWindow('Update downloaded; will install in 5 seconds');
+  sendStatusToWindow('Update downloaded; ');
 });
 function createWindow () {
 
@@ -37,7 +37,7 @@ function createWindow () {
     height: 600,
     webPreferences: {
       nodeIntegration: true,
-    //  contextIsolation: false,
+      contextIsolation: false,
     },
   });
   mainWindow.loadFile('index.html');
